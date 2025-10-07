@@ -1,9 +1,10 @@
 import sqlite3
 
 # 2. Connessione: crea il file 'scuola.db' se non esiste
-conn = sqlite3.connect('scuola.db')
+conn: sqlite3.Connection = sqlite3.connect('scuola.db')
+
 # 3. Creazione Cursore
-cursor = conn.cursor()
+cursor: sqlite3.Cursor = conn.cursor()
 
 try:
     # Eseguo DDL per creare la tabella se non esiste
