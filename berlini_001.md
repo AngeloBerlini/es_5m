@@ -1,6 +1,7 @@
 # ESERCIZIO 1
 
 ```mermaid
+
 erDiagram
 
     APIARIO ||--|{ MIELE : contiene

@@ -1,0 +1,140 @@
+-- database: ./prova.sqlite
+
+CREATE TABLE Utente (
+    id_utente INT PRIMARY KEY ,
+    nome VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Creazione della tabella Libro
+CREATE TABLE Libro (
+    id_libro INT PRIMARY KEY ,
+    titolo VARCHAR(200) NOT NULL,
+    autore VARCHAR(100) NOT NULL,
+    anno_pubblicazione YEAR NOT NULL,
+    FOREIGN KEY(id_utente) REFERENCES Utente(id_utente)
+);
+
+-- Creazione della tabella Prestito
+CREATE TABLE Prestito (
+    id_prestito INT PRIMARY KEY ,
+    id_utente INT NOT NULL,
+    id_libro INT NOT NULL,
+    data_prestito DATE NOT NULL,
+    data_restituzione DATE,
+    FOREIGN KEY (id_utente) REFERENCES Utente(id_utente),
+    FOREIGN KEY (id_libro) REFERENCES Libro(id_libro)
+);
+-- Inserimento di dati di esempio nella tabella Utente
+INSERT INTO Utente (id_utente, nome, email) VALUES
+(1, 'Gianni', 'gianni@example.com'),
+(2, 'Maria', 'maria@example.com'),
+(3, 'Luca', 'luca@example.com');
+
+-- Inserimento di dati di esempio nella tabella Libro
+INSERT INTO Libro (id_libro, titolo, autore, anno_pubblicazione,id_utente) VALUES
+(1, 'Il Signore degli Anelli', 'J.R.R. Tolkien', 1954,2),
+(2, '1984', 'George Orwell', 1949,1),
+(3, 'Il Piccolo Principe', 'Antoine de Saint-Exupéry', 1943,3);
+
+-- Inserimento di dati di esempio nella tabella Prestito
+INSERT INTO Prestito (id_prestito, id_utente, id_libro, data_prestito, data_restituzione) VALUES
+(1, 1, 1, '2025-10-01', '2025-10-15'),
+(2, 2, 2, '2025-10-05', NULL),
+(3, 3, 3, '2025-10-10', '2025-10-20');
+
+-- Query 1: Recupera tutti gli utenti e i libri che hanno preso in prestito
+
+SELECT Utente.nome , Libro.titolo , Prestito.data_prestito, Prestito.data_restituzione
+FROM Utente 
+JOIN Prestito 
+ON Utente.id_utente = Prestito.id_utente
+JOIN Libro  
+ON Prestito.id_libro = Libro.id_libro;
+
+-- Query 2: Trova tutti i prestiti attivi (libri non ancora restituiti)
+
+SELECT *
+FROM Prestito
+WHERE data_restituzione IS NULL;
+
+
+
+-- Query 3: Conta il numero totale di prestiti effettuati
+
+SELECT COUNT(*) AS totale_prestiti
+FROM Prestito;
+
+
+
+-- Query 4: Trova i libri più prestati
+
+--SELECT id_libro, COUNT(*) as num_prestiti
+--FROM Prestito
+--JOIN Libro
+--ON id_libro = Prestito.id_libro
+--ORDER BY id_libro ASC
+
+SELECT Libro.titolo, COUNT(Prestito.id_libro) AS num_prestiti
+FROM Prestito
+JOIN Libro ON Prestito.id_libro = Libro.id_libro
+GROUP BY Prestito.id_libro
+ORDER BY num_prestiti DESC;
+
+
+-- Query 5: Elenca gli utenti che non hanno mai preso in prestito un libro
+
+SELECT nome
+FROM Utente 
+JOIN Prestito 
+ON Utente.id_utente = Prestito.id_utente
+JOIN Libro  
+ON Prestito.id_libro = Libro.id_libro
+WHERE data_prestito is NULL;
+
+
+-- Query 6: Trova i libri pubblicati prima di un certo anno
+
+SELECT * 
+FROM Libro
+WHERE anno_pubblicazione < 1950;
+
+-- Query 7: Recupera i dettagli dei prestiti effettuati in un determinato mese
+
+SELECT *
+FROM Prestito
+WHERE strftime('%m', data_prestito) = '10' AND strftime('%Y', data_prestito) = '2025';
+
+
+-- Query 8: Trova l'utente che ha preso in prestito più libri
+
+SELECT nome, COUNT(Prestito.id_utente) as num_prestiti
+FROM Utente
+JOIN Prestito
+ON Utente.id_utente = Prestito.id_utente
+GROUP BY Prestito.id_utente
+ORDER BY num_prestiti DESC;
+
+-- Query 9: Elenca tutti i libri che non sono mai stati presi in prestito
+
+SELECT *
+FROM Libro
+JOIN Prestito
+ON Libro.id_libro= Prestito.id_libro
+WHERE data_prestito is NULL;
+
+
+
+-- Query 10: Trova i prestiti effettuati da un utente specifico (es. "Maria")
+
+SELECT Utente.nome, Libro.titolo, Prestito.data_prestito, Prestito.data_restituzione
+FROM Utente
+JOIN Prestito
+ON Utente.id_utente = Prestito.id_utente
+JOIN Libro 
+ON Prestito.id_libro = Libro.id_libro
+WHERE Utente.nome = "Maria" ;
+
+-- Fine del file SQL
+
+
