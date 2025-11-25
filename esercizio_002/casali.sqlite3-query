@@ -97,12 +97,26 @@ HAVING total_production > 200;
 
 
 
--- Seleziona la produzione totale per tipologia di miele (typology_id).
+-- Elenco apicoltori che producono miele DOP in una determinata regione
+SELECT Beekeper.name, region
+FROM Beekeper
+JOIN Apiary ON Beekeper.id = beekeeper_id
+GROUP BY region;
 
 
--- Seleziona il numero di mieli per ciascuna tipologia.
--- Seleziona la produzione totale per apicoltore (beekeeper_id).
--- Seleziona la produzione media per arnia (produzione totale divisa per num_hives) per apiario.
--- Seleziona per ogni anno il conteggio delle produzioni con quantità maggiore di 100.
--- Seleziona per ogni miele e anno la somma delle quantità.
 
+-- numero complessivo di apiari per ciascuna regione
+
+SELECT count(code) as num_apiari_per_regione, region
+FROM Apiary 
+GROUP BY region;
+
+
+--quantita di miele prodotto in italia lo scorso anno per ciascuna delle 4 tipologie
+
+SELECT quantity, year , Typology.name 
+FROM Production
+JOIN Honey ON Honey.id = Production.honey_id
+JOIN Typology ON Typology.id = Honey.typology_id
+WHERE year == 2024
+GROUP BY Typology.name;
